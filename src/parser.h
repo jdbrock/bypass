@@ -24,7 +24,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <map>
-#include <boost/algorithm/string.hpp>
+#include <algorithm>
 
 extern "C" {
 #include "markdown.h"

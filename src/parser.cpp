@@ -18,6 +18,16 @@
 
 using namespace std;
 
+static std::vector<std::string> split_string(const std::string& s, char delimiter) {
+	std::vector<std::string> tokens;
+	std::string token;
+	std::istringstream stream(s);
+	while (std::getline(stream, token, delimiter)) {
+		tokens.push_back(token);
+	}
+	return tokens;
+}
+
 static void rndr_blockcode(struct buf *ob, struct buf *text, void *opaque);
 static void rndr_blockquote(struct buf *ob, struct buf *text, void *opaque);
 static void rndr_header(struct buf *ob, struct buf *text, int level, void *opaque);
@@ -126,8 +136,9 @@ namespace Bypass {
 		if ( it != elementSoup.end() ) {
 			Element * element = &((*it).second);
 
-			if (boost::ends_with(element->text, controlCharacters)) {
-				boost::erase_tail(element->text, controlCharacters.size());
+			if (element->text.size() >= controlCharacters.size() &&
+				element->text.compare(element->text.size() - controlCharacters.size(), controlCharacters.size(), controlCharacters) == 0) {
+				element->text.erase(element->text.size() - controlCharacters.size());
 			}
 		}
 	}
@@ -160,7 +171,7 @@ namespace Bypass {
 		if (text) {
 			std::string textString(text->data, text->data + text->size);
 			std::vector<std::string> strs;
-			boost::split(strs, textString, boost::is_any_of("|"));
+			strs = split_string(textString, '|');
 
 			for(vector<std::string>::iterator it = strs.begin(); it != strs.end(); it++) {
 				int pos = atoi((*it).c_str());
@@ -220,7 +231,7 @@ namespace Bypass {
 		std::string textString;
 		if (text) {
 			textString = std::string(text->data, text->data + text->size);
-			boost::split(strs, textString, boost::is_any_of("|"));
+			strs = split_string(textString, '|');
 		}
 		if (strs.size() > 0) {
             std::string str0 = strs[0];
